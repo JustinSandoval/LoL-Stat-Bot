@@ -1,6 +1,6 @@
 const axios = require('axios').default;
 const Discord = require('discord.js')
-const config = require('dotenv').config()
+require('dotenv').config()
 const API_KEY = process.env.API_KEY
 const TOKEN = process.env.TOKEN
 
@@ -24,19 +24,8 @@ client.on('message', async message => {
     
     if(command === 'rank') {
         try{
-            const summoner = await axios.get(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${args}?api_key=${API_KEY}`)
-            const data = summoner.data
+            const data = await getSummonerData(args);
             try{
-                const getRankStats = async (ID) => {
-                    const res = await axios.get(`https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/${ID}?api_key=${API_KEY}`)
-                    return res.data
-                }
-
-                const getLatestVersion = async () => {
-                    const version = (await axios.get('http://ddragon.leagueoflegends.com/api/versions.json')).data[0]
-                    return version;
-                }
-    
                 const stats = await getRankStats(data.id)
                 const version = await getLatestVersion();
     
@@ -50,12 +39,19 @@ client.on('message', async message => {
                     .setDescription(`Summoner Level: ${data.summonerLevel}`)
                     .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
                     .addFields(
-                        { name: 'Flex 5v5', value: `${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L\nWin Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%` }
+                        { 
+                            name: 'Flex 5v5', value: `${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L
+                            Win Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%` 
+                        }
                         
                     )
                     .attachFiles([`./img/ranked-emblems/Emblem_${flexQ.tier.toLowerCase()}.png`])
                     .setImage(`attachment://Emblem_${flexQ.tier.toLowerCase()}.png`)
-                    message.channel.send(embeddedMsg);
+                    message.channel.send(embeddedMsg)
+                    .then(msg => {
+                        msg.delete({ timeout: 20000})
+                    })
+                    .catch(e => console.log(e))
                 } else if(!flexQ && soloQ){
                     const embeddedMsg = new Discord.MessageEmbed()
                     .setColor('#9831a3')
@@ -63,12 +59,19 @@ client.on('message', async message => {
                     .setDescription(`Summoner Level: ${data.summonerLevel}`)
                     .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
                     .addFields(
-                        { name: 'Solo/Duo', value: `${soloQ.tier} ${soloQ.rank}\n${soloQ.leaguePoints} LP / ${soloQ.wins}W ${soloQ.losses}L\nWin Ratio ${Math.round(soloQ.wins/(soloQ.wins + soloQ.losses) * 100)}%` }
+                        { 
+                            name: 'Solo/Duo', value: `${soloQ.tier} ${soloQ.rank}\n${soloQ.leaguePoints} LP / ${soloQ.wins}W ${soloQ.losses}L\n
+                            Win Ratio ${Math.round(soloQ.wins/(soloQ.wins + soloQ.losses) * 100)}%` 
+                        }
                         
                     )
                     .attachFiles([`./img/ranked-emblems/Emblem_${soloQ.tier.toLowerCase()}.png`])
                     .setImage(`attachment://Emblem_${soloQ.tier.toLowerCase()}.png`)
-                    message.channel.send(embeddedMsg);
+                    message.channel.send(embeddedMsg)
+                    .then(msg => {
+                        msg.delete({ timeout: 20000})
+                    })
+                    .catch(e => console.log(e))
                 } else {
                     const embeddedMsg = new Discord.MessageEmbed()
                     .setColor('#9831a3')
@@ -76,47 +79,65 @@ client.on('message', async message => {
                     .setDescription(`Summoner Level: ${data.summonerLevel}`)
                     .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
                     .addFields(
-                        { name: 'Solo/Duo', value: `${soloQ.tier} ${soloQ.rank}\n${soloQ.leaguePoints} LP / ${soloQ.wins}W ${soloQ.losses}L\nWin Ratio ${Math.round(soloQ.wins/(soloQ.wins + soloQ.losses) * 100)}%` }
+                        { 
+                            name: 'Solo/Duo', value: `${soloQ.tier} ${soloQ.rank}\n${soloQ.leaguePoints} LP / ${soloQ.wins}W ${soloQ.losses}L
+                            Win Ratio ${Math.round(soloQ.wins/(soloQ.wins + soloQ.losses) * 100)}%` 
+                        }
                         
                     )
                     .attachFiles([`./img/ranked-emblems/Emblem_${soloQ.tier.toLowerCase()}.png`])
                     .setImage(`attachment://Emblem_${soloQ.tier.toLowerCase()}.png`)
-                    .setFooter(`Flex 5v5\n${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L\nWin Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%`, `https://opgg-static.akamaized.net/images/medals/${flexQ.tier}_1.png?image=q_auto:best&v=1`);
-                    message.channel.send(embeddedMsg);
+                    .setFooter(
+                        `Flex 5v5\n${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L\nWin Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%`, 
+                        `https://opgg-static.akamaized.net/images/medals/${flexQ.tier}_1.png?image=q_auto:best&v=1`
+                        );
+                    message.channel.send(embeddedMsg)
+                    .then(msg => {
+                        msg.delete({ timeout: 20000})
+                    })
+                    .catch(e => console.log(e))
                 }
     
                 
             } catch (e) {
-                console.log(e)
+                // console.log(e)
                 message.channel.send('Summoner is unranked')
+                .then(msg => {
+                    msg.delete({ timeout: 5000})
+                })
+                .catch(e => console.log(e)) 
             }
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
             message.channel.send('Summoner not found')
+            .then(msg => {
+                msg.delete({ timeout: 5000})
+            })
+            .catch(e => console.log(e))
+        }finally {
+            message.delete({timeout: 5000})
         }
         
     }
 
-    
-    // async function getLatestDDragon(language = "en_US") {
-    //     let response;
-    //     let versionIndex = 0;
-    //     do { // I loop over versions because 9.22.1 is broken
-    //         const version = (await fetch("http://ddragon.leagueoflegends.com/api/versions.json").then(async(r) => await r.json()))[versionIndex++];
-        
-    //         response = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/${language}/profileicon.json`);
-    //     }
-    //     while (!response.ok)
-        
-    //     profileJson[language] = await response.json();
-    //     return profileJson[language];
-    // }
-
-    
-    
-
 });
+
+const getSummonerData = async (name) => {
+    const summoner = await axios.get(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${name}?api_key=${API_KEY}`)
+    return summoner.data
+}
+
+const getRankStats = async (ID) => {
+    const res = await axios.get(`https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/${ID}?api_key=${API_KEY}`)
+    return res.data
+}
+
+const getLatestVersion = async () => {
+    const version = (await axios.get('http://ddragon.leagueoflegends.com/api/versions.json')).data[0]
+    return version;
+}
+
 
 // login to Discord with your app's token
 client.login(TOKEN);
