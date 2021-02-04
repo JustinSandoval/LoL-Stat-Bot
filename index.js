@@ -2,6 +2,7 @@ const axios = require('axios').default;
 const Discord = require('discord.js')
 const config = require('dotenv').config()
 const API_KEY = process.env.API_KEY
+const TOKEN = process.env.TOKEN
 
 const { Client, MessageEmbed } = require('discord.js');
 
@@ -118,4 +119,4 @@ client.on('message', async message => {
 });
 
 // login to Discord with your app's token
-client.login('ODA1MzUwMzM0MTU5NTE5NzQ1.YBZm8g.hAl44JAOk-5PFCXoRdZNYEiETNM');
+client.login(TOKEN);
