@@ -31,91 +31,122 @@ client.on('message', async message => {
     
                 const soloQ = stats.filter(queue => queue.queueType === "RANKED_SOLO_5x5")[0]
                 const flexQ = stats.filter(queue => queue.queueType === "RANKED_FLEX_SR")[0]
+
+                const queue = !soloQ ? flexQ : soloQ
+
+
+                const embeddedMsg = new Discord.MessageEmbed()
+                    .setColor('#9831a3')
+                    .setTitle(data.name)
+                    .setDescription(`Summoner Level: ${data.summonerLevel}`)
+                    .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
+                    .addFields(
+                        { 
+                            name: `${!soloQ ? "Flex 5v5": "Solo/Duo"}`, value:`${queue.tier} ${queue.rank}\n${queue.leaguePoints} LP / ${queue.wins}W ${queue.losses}L
+                            Win Ratio ${Math.round(queue.wins/(queue.wins + queue.losses) * 100)}%`
+                        }
+                        
+                    )
+                    .attachFiles([`./img/ranked-emblems/Emblem_${queue.tier.toLowerCase()}.png`])
+                    .setImage(`attachment://Emblem_${queue.tier.toLowerCase()}.png`)
+                    .setFooter( soloQ ?
+                                `Flex 5v5\n${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L\nWin Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%` : '', 
+                                `https://opgg-static.akamaized.net/images/medals/${flexQ.tier}_1.png?image=q_auto:best&v=1`
+                    )
+                    
+                    message.channel.send(embeddedMsg)
+                    .then(msg => {
+                        msg.delete({ timeout: 20000})
+                    })
+                    .catch(e => console.log(e))
+
     
-                if(!soloQ && flexQ){
-                    const embeddedMsg = new Discord.MessageEmbed()
-                    .setColor('#9831a3')
-                    .setTitle(data.name)
-                    .setDescription(`Summoner Level: ${data.summonerLevel}`)
-                    .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
-                    .addFields(
-                        { 
-                            name: 'Flex 5v5', value: `${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L
-                            Win Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%` 
-                        }
+                // if(!soloQ && flexQ){
+                //     const embeddedMsg = new Discord.MessageEmbed()
+                //     .setColor('#9831a3')
+                //     .setTitle(data.name)
+                //     .setDescription(`Summoner Level: ${data.summonerLevel}`)
+                //     .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
+                //     .addFields(
+                //         { 
+                //             name: 'Flex 5v5', value: `${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L
+                //             Win Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%` 
+                //         }
                         
-                    )
-                    .attachFiles([`./img/ranked-emblems/Emblem_${flexQ.tier.toLowerCase()}.png`])
-                    .setImage(`attachment://Emblem_${flexQ.tier.toLowerCase()}.png`)
-                    message.channel.send(embeddedMsg)
-                    .then(msg => {
-                        msg.delete({ timeout: 20000})
-                    })
-                    .catch(e => console.log(e))
-                } else if(!flexQ && soloQ){
-                    const embeddedMsg = new Discord.MessageEmbed()
-                    .setColor('#9831a3')
-                    .setTitle(data.name)
-                    .setDescription(`Summoner Level: ${data.summonerLevel}`)
-                    .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
-                    .addFields(
-                        { 
-                            name: 'Solo/Duo', value: `${soloQ.tier} ${soloQ.rank}\n${soloQ.leaguePoints} LP / ${soloQ.wins}W ${soloQ.losses}L\n
-                            Win Ratio ${Math.round(soloQ.wins/(soloQ.wins + soloQ.losses) * 100)}%` 
-                        }
+                //     )
+                //     .attachFiles([`./img/ranked-emblems/Emblem_${flexQ.tier.toLowerCase()}.png`])
+                //     .setImage(`attachment://Emblem_${flexQ.tier.toLowerCase()}.png`)
+                //     message.channel.send(embeddedMsg)
+                //     .then(msg => {
+                //         msg.delete({ timeout: 20000})
+                //     })
+                //     .catch(e => console.log(e))
+                // } else if(!flexQ && soloQ){
+                //     const embeddedMsg = new Discord.MessageEmbed()
+                //     .setColor('#9831a3')
+                //     .setTitle(data.name)
+                //     .setDescription(`Summoner Level: ${data.summonerLevel}`)
+                //     .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
+                //     .addFields(
+                //         { 
+                //             name: 'Solo/Duo', value: `${soloQ.tier} ${soloQ.rank}\n${soloQ.leaguePoints} LP / ${soloQ.wins}W ${soloQ.losses}L\n
+                //             Win Ratio ${Math.round(soloQ.wins/(soloQ.wins + soloQ.losses) * 100)}%` 
+                //         }
                         
-                    )
-                    .attachFiles([`./img/ranked-emblems/Emblem_${soloQ.tier.toLowerCase()}.png`])
-                    .setImage(`attachment://Emblem_${soloQ.tier.toLowerCase()}.png`)
-                    message.channel.send(embeddedMsg)
-                    .then(msg => {
-                        msg.delete({ timeout: 20000})
-                    })
-                    .catch(e => console.log(e))
-                } else {
-                    const embeddedMsg = new Discord.MessageEmbed()
-                    .setColor('#9831a3')
-                    .setTitle(data.name)
-                    .setDescription(`Summoner Level: ${data.summonerLevel}`)
-                    .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
-                    .addFields(
-                        { 
-                            name: 'Solo/Duo', value: `${soloQ.tier} ${soloQ.rank}\n${soloQ.leaguePoints} LP / ${soloQ.wins}W ${soloQ.losses}L
-                            Win Ratio ${Math.round(soloQ.wins/(soloQ.wins + soloQ.losses) * 100)}%` 
-                        }
+                //     )
+                //     .attachFiles([`./img/ranked-emblems/Emblem_${soloQ.tier.toLowerCase()}.png`])
+                //     .setImage(`attachment://Emblem_${soloQ.tier.toLowerCase()}.png`)
+                //     message.channel.send(embeddedMsg)
+                //     .then(msg => {
+                //         msg.delete({ timeout: 20000})
+                //     })
+                //     .catch(e => console.log(e))
+                // } else {
+                //     const embeddedMsg = new Discord.MessageEmbed()
+                //     .setColor('#9831a3')
+                //     .setTitle(data.name)
+                //     .setDescription(`Summoner Level: ${data.summonerLevel}`)
+                //     .setThumbnail(`http://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${data.profileIconId}.png`)
+                //     .addFields(
+                //         { 
+                //             name: 'Solo/Duo', value: `${soloQ.tier} ${soloQ.rank}\n${soloQ.leaguePoints} LP / ${soloQ.wins}W ${soloQ.losses}L
+                //             Win Ratio ${Math.round(soloQ.wins/(soloQ.wins + soloQ.losses) * 100)}%` 
+                //         }
                         
-                    )
-                    .attachFiles([`./img/ranked-emblems/Emblem_${soloQ.tier.toLowerCase()}.png`])
-                    .setImage(`attachment://Emblem_${soloQ.tier.toLowerCase()}.png`)
-                    .setFooter(
-                        `Flex 5v5\n${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L\nWin Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%`, 
-                        `https://opgg-static.akamaized.net/images/medals/${flexQ.tier}_1.png?image=q_auto:best&v=1`
-                        );
-                    message.channel.send(embeddedMsg)
-                    .then(msg => {
-                        msg.delete({ timeout: 20000})
-                    })
-                    .catch(e => console.log(e))
-                }
+                //     )
+                //     .attachFiles([`./img/ranked-emblems/Emblem_${soloQ.tier.toLowerCase()}.png`])
+                //     .setImage(`attachment://Emblem_${soloQ.tier.toLowerCase()}.png`)
+                //     .setFooter(
+                //         `Flex 5v5\n${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L\nWin Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%`, 
+                //         `https://opgg-static.akamaized.net/images/medals/${flexQ.tier}_1.png?image=q_auto:best&v=1`
+                //         );
+                //     message.channel.send(embeddedMsg)
+                //     .then(msg => {
+                //         msg.delete({ timeout: 20000})
+                //     })
+                //     .catch(e => console.log(e))
+                // }
     
                 
             } catch (e) {
-                // console.log(e)
+                console.log(e)
                 message.channel.send('Summoner is unranked')
                 .then(msg => {
                     msg.delete({ timeout: 5000})
                 })
                 .catch(e => console.log(e)) 
+                    
+                
             }
 
         } catch (e) {
-            // console.log(e)
+            console.log(e)
             message.channel.send('Summoner not found')
             .then(msg => {
                 msg.delete({ timeout: 5000})
             })
             .catch(e => console.log(e))
-        }finally {
+        } finally {
             message.delete({timeout: 5000})
         }
         
