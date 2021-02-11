@@ -22,6 +22,7 @@ client.on('message', async message => {
 	const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
     const version = await getLatestVersion();
+    
     if(command === 'rank') {
         try{
             const data = await getSummonerData(args);
@@ -92,7 +93,7 @@ client.on('message', async message => {
             message.delete({timeout: 5000})
         }
         
-    }
+    } 
 
 });
 
