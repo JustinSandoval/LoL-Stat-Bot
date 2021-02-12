@@ -28,12 +28,10 @@ client.on('message', async message => {
             const data = await getSummonerData(args);
             try{
                 const stats = await getRankStats(data.id)
-                
                 const soloQ = stats.filter(queue => queue.queueType === "RANKED_SOLO_5x5")[0]
                 const flexQ = stats.filter(queue => queue.queueType === "RANKED_FLEX_SR")[0]
 
                 const queue = !soloQ ? flexQ : soloQ
-
 
                 const embeddedMsg = new Discord.MessageEmbed()
                     .setColor('#9831a3')
@@ -49,9 +47,9 @@ client.on('message', async message => {
                     )
                     .attachFiles([`./img/ranked-emblems/Emblem_${queue.tier.toLowerCase()}.png`])
                     .setImage(`attachment://Emblem_${queue.tier.toLowerCase()}.png`)
-                    .setFooter( soloQ ?
-                                `Flex 5v5\n${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L\nWin Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%` : '', 
-                                `https://opgg-static.akamaized.net/images/medals/${flexQ.tier}_1.png?image=q_auto:best&v=1`
+                    .setFooter( soloQ && flexQ ?
+                                `Flex 5v5\n${flexQ.tier} ${flexQ.rank}\n${flexQ.leaguePoints} LP / ${flexQ.wins}W ${flexQ.losses}L\nWin Ratio ${Math.round(flexQ.wins/(flexQ.wins + flexQ.losses) * 100)}%`: '' , 
+                                soloQ && flexQ ? `https://opgg-static.akamaized.net/images/medals/${flexQ.tier}_1.png?image=q_auto:best&v=1` : ''
                     )
                     
                     message.channel.send(embeddedMsg)
@@ -61,6 +59,7 @@ client.on('message', async message => {
                     .catch(e => console.log(e))
                 
             } catch (e) {
+                console.log(e)
                 const embeddedMsg = new Discord.MessageEmbed()
                     .setColor('#9831a3')
                     .setTitle(data.name)
