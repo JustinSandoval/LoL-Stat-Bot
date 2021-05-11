@@ -1,5 +1,5 @@
 # LoL-Stat-Bot
-League of Legends bot for Discord which makes calls to the League of Legends API to access player stats
+League of Legends bot for Discord which makes calls to the Riot Games API to access player stats
 
 # Requirements
 <li>You must have a Riot Games account and register on developer.riotgames.com in order to use their API</li>
